@@ -83,7 +83,7 @@ batteryADC = Get_Battery_Voltage_ADC();
 
 '''
 
-v = '0.7.1'
+v = '0.7.5'
 
 print(f'Robot v{v}')
 
@@ -334,6 +334,85 @@ def move_servoH_by_LDR(duracion = 10, N = 40):
         
     set_servos()
 
+pcf = None
+
+def init_pcf8574():
+    global pcf
+    if pcf == None:
+        from pcf8574 import PCF8574
+        pcf = PCF8574(i2c, 0x20)
+        
+def test_pcf(duracion = 10):
+    print('Testing PCF8574 (line tracking)')
+    init_pcf8574()
+    init_time = time()
+
+    while time()-init_time < duracion:
+        print(f'{pcf.pin(0)} {pcf.pin(1)} {pcf.pin(2)}',end = '\r')
+        sleep_ms(50)
+        
+matrix = None
+
+def init_matrix():
+    global matrix
+    
+    if matrix == None:
+        from hybotics_ht16k33 import matrix
+        matrix = matrix.Matrix16x8(i2c,address=0x71)
+        
+def test_matrix(duracion = 10):
+    print('testing led matrix')
+    init_matrix()
+    matrix.fill(0)
+
+    # Set a pixel in the origin 0, 0 position.
+    matrix[0, 0] = 1
+    # Set a pixel in the middle 8, 4 position.
+    matrix[8, 4] = 1
+    # Set a pixel in the opposite 15, 7 position.
+    matrix[15, 7] = 1
+
+    sleep_ms(200)
+
+    # Draw a Smiley Face
+    matrix.fill(0)
+
+    for row in range(2, 6):
+        matrix[row, 0] = 1
+        matrix[row, 7] = 1
+
+    for column in range(2, 6):
+        matrix[0, column] = 1
+        matrix[7, column] = 1
+
+    matrix[1, 1] = 1
+    matrix[1, 6] = 1
+    matrix[6, 1] = 1
+    matrix[6, 6] = 1
+    matrix[2, 5] = 1
+    matrix[5, 5] = 1
+    matrix[2, 3] = 1
+    matrix[5, 3] = 1
+    matrix[3, 2] = 1
+    matrix[4, 2] = 1
+
+    # Move the Smiley Face Around
+    init_time = time()
+
+    while time()-init_time < duracion:
+        for frame in range(0, 8):
+            matrix.shift_right(True)
+            sleep_ms(50)
+        for frame in range(0, 8):
+            matrix.shift_down(True)
+            sleep_ms(50)
+        for frame in range(0, 8):
+            matrix.shift_left(True)
+            sleep_ms(50)
+        for frame in range(0, 8):
+            matrix.shift_up(True)
+            sleep_ms(50)
+    
 def tests():
     test_fade_color(0,MAX_COLOR,1,5)
     test_fade_color(MAX_COLOR,-1,-1,5)
@@ -342,6 +421,8 @@ def tests():
     test_LDR()
     test_i2c()
     print(f'Battery: {get_battery_value()}')
+    test_pcf()
+    test_matrix()
     test_servo_new()
     move_servoH_by_LDR()
     test_motores()
@@ -349,4 +430,5 @@ def tests():
     set_servos()
     
 if __name__ == '__main__':
-    tests()
+#    tests()
+    test_matrix()
