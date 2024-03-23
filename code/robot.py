@@ -38,7 +38,7 @@ M3_IN2 | LED13
 M1_IN2 | LED14
 M1_IN1 | LED15
 
-PCA9685 I2C ¿0x5F?
+PCA9685 I2C 0x5F
 -------
 FREQUENCY          1000      //Define the operating frequency of servo
 SERVO_0  0         //Define PCA9685 channel to control servo 1
@@ -83,22 +83,35 @@ batteryADC = Get_Battery_Voltage_ADC();
 
 '''
 
-v = 0.5
+v = '0.7.1'
 
 print(f'Robot v{v}')
 
 PIN_BATTERY = 32
 N_LEDS_RGB = 12
 PIN_LEDS_RGB = 32
-PIN_LDR = 33
+PIN_LDR = 33 # 2 LDRs ¿in a current divider?
 PIN_SDA = 13
 PIN_SCL = 14
 PIN_TRIGGER = 12
 PIN_ECHO = 15
 
-import machine
-import neopixel
-import time
+# Salidas motores
+
+M2_IN2 = 8
+M2_IN1 = 9
+M4_IN1 = 10
+M4_IN2 = 11
+M3_IN1 = 12
+M3_IN2 = 13
+M1_IN2 = 14
+M1_IN1 = 15
+
+motores = [[15,14],[9,8],[12,13],[10,11]]
+
+from machine import Pin, SoftI2C, ADC, PWM
+from neopixel import NeoPixel
+from time import sleep_ms, time
 
 
 MAX_COLOR = 50
@@ -108,20 +121,20 @@ COLOR_RED = (MAX_COLOR,0,0)
 COLOR_GREEN = (0,MAX_COLOR,0)
 COLOR_BLUE = (0,0,MAX_COLOR)
 
-leds_RGB = neopixel.NeoPixel(machine.Pin(PIN_LEDS_RGB), N_LEDS_RGB)
+leds_RGB = NeoPixel(Pin(PIN_LEDS_RGB), N_LEDS_RGB)
 
-i2c = machine.SoftI2C(sda = machine.Pin(PIN_SDA), scl = machine.Pin(PIN_SCL))
+i2c = SoftI2C(sda = Pin(PIN_SDA), scl = Pin(PIN_SCL))
 
 LOW_VOLTAGE_BATTERY = 2100      #Set the minimum battery voltage
 
 batteryCoefficient = 3.4   # Set the proportional coefficient
 
-battery_ADC = machine.ADC(machine.Pin(PIN_BATTERY))
+battery_ADC = ADC(Pin(PIN_BATTERY))
 
 def get_battery_value(N_samples = 10):
     batteryADC_value = 0
     for i in range(N_samples):
-        batteryADC_value += battery_ADC.read_u16()
+        batteryADC_value += battery_ADC.read()
     batteryADC_value /= N_samples
     
     if (batteryADC_value <= LOW_VOLTAGE_BATTERY):
@@ -161,7 +174,7 @@ def test_fade_color(first_color = 0, max_color = MAX_COLOR, step_color=1, pause=
     print('test fade color')
     for i in range(first_color,max_color,step_color):
         set_leds_RGB_color((i,i,i))
-        time.sleep_ms(pause)
+        sleep_ms(pause)
 
 def run_color(colorLED = COLOR_BLUE, colorBack = COLOR_BLACK,
                    first_LED = 0, last_LED = N_LEDS_RGB,
@@ -170,24 +183,170 @@ def run_color(colorLED = COLOR_BLUE, colorBack = COLOR_BLACK,
             set_leds_RGB_color(colorBack, False)
             leds_RGB[i] = colorLED
             leds_RGB.write()
-            time.sleep_ms(pause)
+            sleep_ms(pause)
             
 def test_run_color(n_veces = 1, pause = 50):
     print('test led run')
     for j in range(n_veces):
         run_color(pause = pause)
-        time.sleep_ms(300-50*j)
+        sleep_ms(300-50*j)
     for j in range(n_veces):
         run_color(pause = pause,colorLED = COLOR_RED,first_LED=N_LEDS_RGB-1,last_LED=-1,step_LEDS=-1)
-        time.sleep_ms(300-50*j)        
+        sleep_ms(300-50*j)
         
+
+servos = None
+
+def init_servos_old():
+    from servo_pca9685 import Servos
+    global servos
+    servos = Servos(i2c, address=0x5F)
+    
+def test_servo_old():
+    if servos == None:
+        init_servos_old()
+    for j in range(2):
+        print(f'test servo {j}')
+        for i in range(20,180):
+            servos.position(j,degrees=i)
+            print(j,i,end='\r')
+            sleep_ms(100)
+
+servoH = None
+servoV = None
+
+MIN_SERVO_H = 50
+MAX_SERVO_H = 180
+MIN_SERVO_V = 0
+MAX_SERVO_V = 180
+
+def init_servos_new():
+    global servoH, servoV
+    if servoV == None or servoV == None:
+        from micropython_pca9685 import PCA9685, Servo    
+        pca = PCA9685(i2c, address = 0x5F)
+        pca.frequency = 50
+        servoH = Servo(pca.channels[0])
+        servoV = Servo(pca.channels[1])
+
+def test_servo_new():
+    init_servos_new()
+    for i in range(MIN_SERVO_V, MAX_SERVO_V):
+        servoV.angle = i
+        print(f'servoV {i}  ',end='\r')
+        sleep_ms(30)        
+    for i in range(MIN_SERVO_H, MAX_SERVO_H):
+        servoH.angle = i
+        print(f'servoH {i}  ',end='\r')
+        sleep_ms(30)
+    set_servos()
+
+def set_servos(posH = (MIN_SERVO_V + MAX_SERVO_V)//2, posV = (MIN_SERVO_V + MAX_SERVO_V)//2):
+    init_servos_new()
+    servoV.angle = posV
+    servoH.angle = posH
+        
+pca9685 = None
+
+def init_pca9685():
+    global pca9685
+    from pca9685 import PCA9685 
+    pca9685 = PCA9685(i2c, address=0x5F)
+    pca9685.freq(1500)
+
+
+def set_speed_motor(i,speed):
+    if pca9685 == None:
+        init_pca9685()
+        
+    if speed < 0:
+        pca9685.duty(motores[i][0],0)
+        pca9685.duty(motores[i][1],abs(speed))
+    else:
+        pca9685.duty(motores[i][0],speed)
+        pca9685.duty(motores[i][1],0)
+
+
+def set_robot_turn(speed):
+    set_speed_motor(0,speed)
+    set_speed_motor(1,speed)
+    set_speed_motor(2, -speed)
+    set_speed_motor(3, -speed)
+    
+def set_robot_moves(speed):
+    for i in range(4):
+        set_speed_motor(i,speed)    
+
+def test_motores():
+    for i in range(4):
+        for speed in range(-4000,4000,100):
+            set_speed_motor(i,speed)
+            sleep_ms(30)
+            print(f'motor[{i}] - {speed}   ',end='\r')
+        set_speed_motor(i,0)
+        print(f'motor[{i}] STOP   ')
+    
+
+def test_robot_moves(duracion = 2000):
+    # forward
+    print('forward')
+    set_robot_moves(4000)
+    sleep_ms(duracion)
+    print('backward')
+    set_robot_moves(-4000)
+    sleep_ms(duracion)
+    print('Turn')
+    set_robot_turn(3000)
+    sleep_ms(duracion)
+    print('Stop')
+    set_robot_moves(0)
+    
+ldr = ADC(Pin(PIN_LDR), atten=ADC.ATTN_11DB)
+MAX_LDR = 4000
+
+def test_LDR(duracion = 10):
+    global MAX_LDR
+    print('Testing LDR')
+    init_time = time()
+    while time()-init_time < duracion:
+        value_LDR = ldr.read()
+        print(f'{value_LDR}   {duracion - int(time()-init_time)}s   ',end='\r')
+        if MAX_LDR < value_LDR:
+            MAX_LDR = value_LDR
+            print(f'MAX_LDR {MAX_LDR}')
+        sleep_ms(50)        
+
+def move_servoH_by_LDR(duracion = 10, N = 40):
+    print('Move servoH by LDR value')
+    init_servos_new()
+    init_time = time()
+
+    while time()-init_time < duracion:
+        
+        media = 0
+        for i in range(N):
+            value_LDR = ldr.read()
+            media += value_LDR
+            print(f'{value_LDR}   {duracion - int(time()-init_time)}s   ',end='\r')
+        media /= N 
+        servoH.angle = 180 - (MAX_LDR - media)*(MAX_SERVO_H - MIN_SERVO_H)/MAX_LDR
+        sleep_ms(10)
+        
+    set_servos()
+
 def tests():
     test_fade_color(0,MAX_COLOR,1,5)
     test_fade_color(MAX_COLOR,-1,-1,5)
     test_run_color()
     set_leds_RGB_color(COLOR_BLACK)
+    test_LDR()
     test_i2c()
     print(f'Battery: {get_battery_value()}')
-
+    test_servo_new()
+    move_servoH_by_LDR()
+    test_motores()
+    test_robot_moves()
+    set_servos()
+    
 if __name__ == '__main__':
     tests()
