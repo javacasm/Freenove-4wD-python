@@ -80,6 +80,7 @@ ojos_abiertos =[0b0011110000111100,
                 0b0101101001011010,
                 0b0100001001000010,
                 0b0011110000111100]
+
 ojos_pequeños = [0b0011110000111100,
                  0b0100001001000010,
                  0b0100001001000010,
@@ -92,6 +93,7 @@ ojos_cerrados = [0,0,
                  0b0111111001111110,
                  0b0111111001111110,
                  0,0]
+
 def show_bin_line(valor,x=0,y=0,width=16):
     for j in range(width):
         bit = valor & 1
@@ -136,6 +138,7 @@ def movimiento_bajo_pupila(espera = 300):
     for x_base in range(2,5):
         show_ojos_pupila(x_base)
         sleep_ms(espera)
+        
 def test_numbers():
     init_matrix()
     matrix.fill(1)
@@ -163,7 +166,10 @@ def humm(espera = 300):
     sleep_ms(espera)
     show_ojos_pupila(4,y=4)
 
-show_charset(pausa=300)  
-#show_text('dadi',debug=True)
+#show_charset(pausa=300)  
+show_text('dadi',debug=True)
+sleep_ms(1000)
+test_numbers()
 #parpadeo()
+
 #humm()

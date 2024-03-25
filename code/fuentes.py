@@ -170,7 +170,7 @@ CHARSET_SMALL = [
         b"\x08\x54\x3c",      # a - Ascii 97
         b"\xfe\x22\x1c",      # b
         b"\x1c\x22\x22",      # c
-        b"\x1c\x14\xfc",      # d
+        b"\x1c\x14\x7c",      # d
         b"\x1c\x2a\x10",      # e
         b"\x10\x7e\x90",      # f
         b"\x18\x25\x3e",      # g
