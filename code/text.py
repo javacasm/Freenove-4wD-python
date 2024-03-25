@@ -136,6 +136,15 @@ def movimiento_bajo_pupila(espera = 300):
     for x_base in range(2,5):
         show_ojos_pupila(x_base)
         sleep_ms(espera)
+def test_numbers():
+    init_matrix()
+    matrix.fill(1)
+    sleep_ms(1000)
+    show_text('0123',height=5)
+    sleep_ms(1000)
+    show_number(4567,height=5)
+    sleep_ms(1000)
+    show_text('8910',height=5)
     
 def humm(espera = 300):
     show_image(ojos_vacios)
@@ -154,15 +163,7 @@ def humm(espera = 300):
     sleep_ms(espera)
     show_ojos_pupila(4,y=4)
 
-init_matrix()
-matrix.fill(1)
-sleep_ms(1000)
-show_text('0123',height=5)
-sleep_ms(1000)
-show_number(4567,height=5)
-sleep_ms(1000)
-show_text('8910',height=5)
-#show_charset(pausa=300)  
+show_charset(pausa=300)  
 #show_text('dadi',debug=True)
 #parpadeo()
 #humm()

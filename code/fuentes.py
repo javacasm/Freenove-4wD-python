@@ -1,7 +1,7 @@
 v = 0.5
 
 print(f'fuentes v{v}')
-
+# from HT16K33-Python
 CHARSET_BIG = [
         b"\x00\x00",              # space - Ascii 32
         b"\xfa",                  # !
@@ -131,48 +131,48 @@ CHARSET_SMALL = [
         b"\x36\x36",              # : - Ascii 58
         b"\x36\x37",              #
         b"\x10\x28\x44\x82",      # <
-        b"\x24\x24\x24\x24\x24",  # =
+        b"\x24\x24\x24",  # =
         b"\x82\x44\x28\x10",      # >
         b"\x60\x80\x9a\x90\x60",  # ?
         b"\x7c\x82\xba\xaa\x78",  # @
-        b"\x7e\x90\x90\x90\x7e",  # A - Ascii 65
-        b"\xfe\x92\x92\x92\x6c",  # B
-        b"\x7c\x82\x82\x82\x44",  # C
-        b"\xfe\x82\x82\x82\x7c",  # D
-        b"\xfe\x92\x92\x92\x82",  # E
-        b"\xfe\x90\x90\x90\x80",  # F
-        b"\x7c\x82\x92\x92\x5c",  # G
-        b"\xfe\x10\x10\x10\xfe",  # H
+        b"\x7e\x90\x7e",  # A - Ascii 65
+        b"\xfe\x92\x6c",  # B
+        b"\x7c\x82\x44",  # C
+        b"\xfe\x82\x7c",  # D
+        b"\xfe\x92\x82",  # E
+        b"\xfe\x90\x80",  # F
+        b"\x7c\x82\x92\x5c",  # G
+        b"\xfe\x10\xfe",  # H
         b"\x82\xfe\x82",          # I
-        b"\x0c\x02\x02\x02\xfc",  # J
+        b"\x0c\x02\xfc",  # J
         b"\xfe\x10\x28\x44\x82",  # K
-        b"\xfe\x02\x02\x02",      # L
+        b"\xfe\x02",      # L
         b"\xfe\x40\x20\x40\xfe",  # M
         b"\xfe\x40\x20\x10\xfe",  # N
-        b"\x7c\x82\x82\x82\x7c",  # O
-        b"\xfe\x90\x90\x90\x60",  # P
+        b"\x7c\x82\x7c",  # O
+        b"\xfe\x90\x60",  # P
         b"\x7c\x82\x92\x8c\x7a",  # Q
-        b"\xfe\x90\x90\x98\x66",  # R
-        b"\x64\x92\x92\x92\x4c",  # S
-        b"\x80\x80\xfe\x80\x80",  # T
-        b"\xfc\x02\x02\x02\xfc",  # U
+        b"\xfe\x90\x98\x66",  # R
+        b"\x64\x92\x4c",  # S
+        b"\x80\xfe\x80",  # T
+        b"\xfc\x02\xfc",  # U
         b"\xf8\x04\x02\x04\xf8",  # V
         b"\xfc\x02\x3c\x02\xfc",  # W
         b"\xc6\x28\x10\x28\xc6",  # X
         b"\xe0\x10\x0e\x10\xe0",  # Y
-        b"\x86\x8a\x92\xa2\xc2",  # Z - Ascii 90
-        b"\xfe\x82\x82",          # [
+        b"\x86\x8a\x92\xa2",  # Z - Ascii 90
+        b"\xfe\x82",          # [
         b"\x40\x20\x10\x08\x04",  # \
-        b"\x82\x82\xfe",          # ]
+        b"\x82\xfe",          # ]
         b"\x20\x40\x80\x40\x20",  # ^
-        b"\x02\x02\x02\x02\x02",  # _
+        b"\x02\x02\x02",  # _
         b"\xc0\xe0",              # '
         b"\x08\x54\x3c",      # a - Ascii 97
         b"\xfe\x22\x1c",      # b
         b"\x1c\x22\x22",      # c
         b"\x1c\x14\xfc",      # d
         b"\x1c\x2a\x10",      # e
-        b"\x10\x7e\x90\x80",      # f
+        b"\x10\x7e\x90",      # f
         b"\x18\x25\x3e",      # g
         b"\xfe\x20\x1e",      # h
         b"\x5c",              # i
