@@ -166,10 +166,11 @@ def humm(espera = 300):
     sleep_ms(espera)
     show_ojos_pupila(4,y=4)
 
-#show_charset(pausa=300)  
-show_text('dadi',debug=True)
-sleep_ms(1000)
-test_numbers()
-#parpadeo()
 
-#humm()
+def tests():
+    #show_charset(pausa=300)  
+    show_text('dadi',debug=True)
+    sleep_ms(1000)
+    test_numbers()
+    # parpadeo()
+    humm()
